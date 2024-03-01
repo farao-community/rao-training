@@ -9,9 +9,9 @@ You can use methods 'drawNetwork' if you want to draw the network.
 
 ## Preventive RAO
 1. Create a CRAC with a preventive, an outage, and a curative instant
-2. Create a preventive CNEC on line "NNL2AA1  BBE3AA1  1", limit it to -500/+500 MW
+2. Create an optimized preventive CNEC on line "NNL2AA1  BBE3AA1  1", limit it to -500/+500 MW
 3. Run RAO, what happens?
-4. Create a network action (PRA) that closes "NNL2AA1  BBE3AA1  1"
+4. Create a network action (PRA) that closes "NNL2AA1  BBE3AA1  2"
 5. Run RAO, what happens?
 
 ## N-1 curative RAO
@@ -23,9 +23,11 @@ You can use methods 'drawNetwork' if you want to draw the network.
 
 ## N-2 curative RAO
 1. Create a contingency "co2" on the loss of "FFR2AA1  NNL3AA1  1" & "FFR1AA1  FFR3AA1  1"
-2. Run RAO, what happens?
-3. Add a CRA to close "NNL2AA1  BBE3AA1  3" & reduce injection on "NNL1AA1 _generator" from 1500 to 1200, and increase generation on "FFR1AA1 _generator" from 0 to 300
+2. Create a curative CNEC on line "NNL2AA1  BBE3AA1  1", after co2, limit it to -500/+500 MW
+3. Create a curative CNEC on line "FFR1AA1  FFR2AA1  1", after co2, limit it to -1200/+1200 MW
 4. Run RAO, what happens?
+5. Add a CRA to close "NNL2AA1  BBE3AA1  3", and a second one to reduce injection on "NNL1AA1 _generator" from 1500 to 1200, and increase generation on "FFR1AA1 _generator" from 0 to 300
+6. Run RAO, what happens?
 
 ## Outage CNEC
 1. Re-create preventive & N-1 case

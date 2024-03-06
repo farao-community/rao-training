@@ -1,6 +1,6 @@
 # rao-training
 
-In this RAO training, we will try to optimize the following network.  
+In this RAO training, we will learn how to create a CRAC object in order to optimize the following network.  
 In this simple network, all production (1500 MW) is on node `NNL1AA11` and all consumption (1500 MW) on node `FFR1AA11`.  
 We will consider the following critical elements: 
 - line `NNL2AA11 BBE3AA11 1` has a maximum allowed flow of 500 MW, in basecase and after all contingencies

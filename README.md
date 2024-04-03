@@ -59,7 +59,6 @@ In this case, both critical lines `NNL2AA11 BBE3AA11 1` and `FFR2AA11 FFR3AA11 1
    This means that the RAO will be able to choose the best injection `value` in the range of [1200 - 1800], making sure that
    `NNL1AA11_generator_activePower = -FFR1AAA11_generator_activePower = value`, like in a classic re-dispatching action.  
    The RAO shall produce the same result as above.  
-   *NOTE:* in order to run this, you need to [install and configure OR-Tools](ORTOOLS.md).
 
 ## Outage CNEC
 1. Re-create the preventive & N-1 case, in a new CRAC

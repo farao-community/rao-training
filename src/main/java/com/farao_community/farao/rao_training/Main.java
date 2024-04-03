@@ -12,6 +12,12 @@ import com.powsybl.openrao.raoapi.Rao;
 import com.powsybl.openrao.raoapi.RaoInput;
 import com.powsybl.openrao.raoapi.parameters.ObjectiveFunctionParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
+import com.powsybl.openrao.data.cracapi.usagerule.UsageMethod;
+import com.powsybl.openrao.data.cracapi.CracFactory;
+import com.powsybl.openrao.data.cracapi.InstantKind;
+import com.powsybl.openrao.data.cracapi.cnec.Side;
+import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
+import com.powsybl.openrao.commons.Unit;
 
 import java.nio.file.Path;
 import java.util.Optional;

@@ -12,9 +12,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powybl.core.version>6.2.0</powybl.core.version>
-        <powybl.starter.version>2024.0.1</powybl.starter.version>
-        <openrao.version>5.1.0</openrao.version>
+        <powybl.core.version>6.3.1</powybl.core.version>
+        <powybl.starter.version>2024.1.0</powybl.starter.version>
+        <openrao.version>5.5.0</openrao.version>
         <logback.version>1.2.3</logback.version>
     </properties>
 

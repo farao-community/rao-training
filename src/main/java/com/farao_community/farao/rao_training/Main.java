@@ -2,11 +2,17 @@ package com.farao_community.farao.rao_training;
 
 
 import com.powsybl.contingency.Contingency;
+import com.powsybl.contingency.ContingencyElementType;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.nad.NetworkAreaDiagram;
+import com.powsybl.openrao.commons.Unit;
 import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.CracFactory;
+import com.powsybl.openrao.data.crac.api.InstantKind;
+import com.powsybl.openrao.data.crac.api.networkaction.ActionType;
 import com.powsybl.openrao.data.crac.api.networkaction.NetworkAction;
 import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.raoapi.Rao;
@@ -40,20 +46,20 @@ public class Main {
             .withId("nl2_be3_1_preventive")
             .withNetworkElement("NNL2AA11 BBE3AA11 1")
             .withInstant("preventive")
-            .newThreshold().withSide(Side.LEFT).withMax(500.).withMin(-500.).withUnit(Unit.MEGAWATT).add()
+            .newThreshold().withSide(TwoSides.ONE).withMax(500.).withMin(-500.).withUnit(Unit.MEGAWATT).add()
             .withOptimized()
             .add();
 
         crac.newNetworkAction()
             .withId("close_nl2_be3_2")
-            .newTopologicalAction().withNetworkElement("NNL2AA11 BBE3AA11 2").withActionType(ActionType.CLOSE).add()
-            .newOnInstantUsageRule().withInstant("preventive").withUsageMethod(UsageMethod.AVAILABLE).add()
+            .newTerminalsConnectionAction().withNetworkElement("NNL2AA11 BBE3AA11 2").withActionType(ActionType.CLOSE).add()
+            .newOnInstantUsageRule().withInstant("preventive").add()
             .add();
 
         // N-1 "co1" : contingency, curative CNEC & CRA
         crac.newContingency()
             .withId("co1_loss_of_one_line")
-            .withNetworkElement("FFR2AA11 NNL3AA11 1")
+            .withContingencyElement("FFR2AA11 NNL3AA11 1", ContingencyElementType.BRANCH)
             .add();
 
         crac.newFlowCnec()
@@ -61,21 +67,21 @@ public class Main {
             .withNetworkElement("NNL2AA11 BBE3AA11 1")
             .withInstant("curative")
             .withContingency("co1_loss_of_one_line")
-            .newThreshold().withSide(Side.LEFT).withMax(500.).withMin(-500.).withUnit(Unit.MEGAWATT).add()
+            .newThreshold().withSide(TwoSides.ONE).withMax(500.).withMin(-500.).withUnit(Unit.MEGAWATT).add()
             .withOptimized()
             .add();
 
         crac.newNetworkAction()
             .withId("close_nl2_be3_3")
-            .newTopologicalAction().withNetworkElement("NNL2AA11 BBE3AA11 3").withActionType(ActionType.CLOSE).add()
-            .newOnInstantUsageRule().withInstant("curative").withUsageMethod(UsageMethod.AVAILABLE).add()
+            .newTerminalsConnectionAction().withNetworkElement("NNL2AA11 BBE3AA11 3").withActionType(ActionType.CLOSE).add()
+            .newOnInstantUsageRule().withInstant("curative").add()
             .add();
 
         // N-2 "co2" : contingency, curative CNEC & CRA
         crac.newContingency()
             .withId("co2_loss_of_two_lines")
-            .withNetworkElement("FFR2AA11 NNL3AA11 1")
-            .withNetworkElement("FFR1AA11 FFR3AA11 1")
+            .withContingencyElement("FFR2AA11 NNL3AA11 1", ContingencyElementType.BRANCH)
+            .withContingencyElement("FFR1AA11 FFR3AA11 1", ContingencyElementType.BRANCH)
             .add();
 
         crac.newFlowCnec()
@@ -83,7 +89,7 @@ public class Main {
             .withNetworkElement("NNL2AA11 BBE3AA11 1")
             .withInstant("curative")
             .withContingency("co2_loss_of_two_lines")
-            .newThreshold().withSide(Side.LEFT).withMax(500.).withMin(-500.).withUnit(Unit.MEGAWATT).add()
+            .newThreshold().withSide(TwoSides.ONE).withMax(500.).withMin(-500.).withUnit(Unit.MEGAWATT).add()
             .withOptimized()
             .add();
 
@@ -92,29 +98,23 @@ public class Main {
             .withNetworkElement("FFR2AA11 FFR3AA11 1")
             .withInstant("curative")
             .withContingency("co2_loss_of_two_lines")
-            .newThreshold().withSide(Side.LEFT).withMax(1200.).withMin(-1200.).withUnit(Unit.MEGAWATT).add()
+            .newThreshold().withSide(TwoSides.ONE).withMax(1200.).withMin(-1200.).withUnit(Unit.MEGAWATT).add()
             .withOptimized()
             .add();
 
-        crac.newNetworkAction()
-            .withId("increase_fr1_production")
-            .newInjectionSetPoint().withNetworkElement("FFR1AA11_generator").withSetpoint(-1200.).withUnit(Unit.MEGAWATT).add()
-            .newInjectionSetPoint().withNetworkElement("NNL1AA11_generator").withSetpoint(1200.).withUnit(Unit.MEGAWATT).add()
-            .newOnInstantUsageRule().withInstant("curative").withUsageMethod(UsageMethod.AVAILABLE).add()
-            .add();
-
-        // Optional (needs ORTOOLS): use injection range action instead of injection setpoint
-        /*crac.newInjectionRangeAction()
+        crac.newInjectionRangeAction()
             .withId("increase_fr1_production")
             .withNetworkElementAndKey(-1.0, "FFR1AA11_generator")
             .withNetworkElementAndKey(1.0, "NNL1AA11_generator")
             .newRange().withMin(1200.).withMax(1800.).add()
-            .newOnInstantUsageRule().withInstant("curative").withUsageMethod(UsageMethod.AVAILABLE).add()
-            .add();*/
+            .newOnInstantUsageRule().withInstant("curative").add()
+            .add();
 
         RaoInput raoInput = RaoInput.build(network, crac).build();
         RaoParameters raoParameters = getRaoParameters();
         RaoResult raoResult = Rao.find().run(raoInput, raoParameters);
+
+        System.exit(0);
     }
 
     private static RaoParameters getRaoParameters() {

@@ -1,23 +1,19 @@
 package com.farao_community.farao.rao_training;
 
+
+import com.powsybl.contingency.Contingency;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.nad.NetworkAreaDiagram;
-import com.powsybl.openrao.data.cracapi.Contingency;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.networkaction.NetworkAction;
-import com.powsybl.openrao.data.raoresultapi.RaoResult;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.networkaction.NetworkAction;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
 import com.powsybl.openrao.raoapi.Rao;
 import com.powsybl.openrao.raoapi.RaoInput;
 import com.powsybl.openrao.raoapi.parameters.ObjectiveFunctionParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
-import com.powsybl.openrao.data.cracapi.usagerule.UsageMethod;
-import com.powsybl.openrao.data.cracapi.CracFactory;
-import com.powsybl.openrao.data.cracapi.InstantKind;
-import com.powsybl.openrao.data.cracapi.cnec.Side;
-import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
-import com.powsybl.openrao.commons.Unit;
+import com.powsybl.openrao.raoapi.parameters.extensions.OpenRaoSearchTreeParameters;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -122,10 +118,11 @@ public class Main {
     }
 
     private static RaoParameters getRaoParameters() {
+        OpenRaoSearchTreeParameters searchTreeParameters = new OpenRaoSearchTreeParameters();
+        searchTreeParameters.getLoadFlowAndSensitivityParameters().getSensitivityWithLoadFlowParameters().getLoadFlowParameters().setDc(true);
         RaoParameters raoParameters = new RaoParameters();
-        raoParameters.getLoadFlowAndSensitivityParameters().getSensitivityWithLoadFlowParameters().getLoadFlowParameters().setDc(true);
-        raoParameters.getObjectiveFunctionParameters().setPreventiveStopCriterion(ObjectiveFunctionParameters.PreventiveStopCriterion.MIN_OBJECTIVE);
-        raoParameters.getObjectiveFunctionParameters().setCurativeStopCriterion(ObjectiveFunctionParameters.CurativeStopCriterion.MIN_OBJECTIVE);
+        raoParameters.addExtension(OpenRaoSearchTreeParameters.class, searchTreeParameters);
+        raoParameters.getObjectiveFunctionParameters().setType(ObjectiveFunctionParameters.ObjectiveFunctionType.MAX_MIN_MARGIN);
         return raoParameters;
     }
 
@@ -140,7 +137,7 @@ public class Main {
         String initialVariant = network.getVariantManager().getWorkingVariantId();
         network.getVariantManager().cloneVariant(initialVariant, "tmp");
         network.getVariantManager().setWorkingVariant("tmp");
-        contingency.ifPresent(value -> value.apply(network, null));
+        contingency.ifPresent(value -> value.toModification().apply(network));
         networkActions.forEach(na -> na.apply(network));
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
         loadFlowParameters.setDc(true);

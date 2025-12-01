@@ -45,20 +45,17 @@ In this case, both critical lines `NNL2AA11 BBE3AA11 1` and `FFR2AA11 FFR3AA11 1
 2. Create a curative CNEC on line `NNL2AA11 BBE3AA11 1`, after `co2`, limit it to -500/+500 MW
 3. Create a curative CNEC on line `FFR1AA11 FFR2AA11 1`, after `co2`, limit it to -1200/+1200 MW
 4. Run the RAO and see what happens
-5. Add a CRA to close `NNL2AA11 BBE3AA11 3`, and a second one to reduce injection on `NNL1AA11_generator` from 1500 to 
-   1200, and increase net generation on `FFR1AA11_generator` from -1500 to -1200 (= decreasing net consumption)
+5. Add a curative generator range action (re-dispatching), with the following keys:
+    - `NNL1AA11_generator` : 1.0
+    - `FFR1AAA11_generator` : -1.0
+   In a range of 1200 to 1800, for example.  
+   This means that the RAO will be able to choose the best injection `value` in the range of [1200 - 1800], making sure that
+   `NNL1AA11_generator_activePower = -FFR1AAA11_generator_activePower = value`, like in a classic re-dispatching action.
 6. Run the RAO and see what happens.  
    You shall see that the RAO chooses first to change the injections, then to close the NL-BE line:
    ![after CO2 after CRA1](img/after_co2_after_cra1.svg)
    ![after CO2 after CRA2](img/after_co2_after_cra2.svg)
-7. Alternatively, you can replace the injection network action with an injection range action, with the following keys:
-   - `NNL1AA11_generator` : 1.0
-   - `FFR1AAA11_generator` : -1.0  
    
-   In a range of 1200 to 1800, for example.  
-   This means that the RAO will be able to choose the best injection `value` in the range of [1200 - 1800], making sure that
-   `NNL1AA11_generator_activePower = -FFR1AAA11_generator_activePower = value`, like in a classic re-dispatching action.  
-   The RAO shall produce the same result as above.  
 
 ## Outage CNEC
 1. Re-create the preventive & N-1 case, in a new CRAC
